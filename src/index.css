@@ -1,0 +1,216 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer components {
+  /* Modern Card Component */
+  .modern-card {
+    @apply bg-white rounded-2xl shadow-lg border border-gray-100 p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+  }
+
+  .modern-card-dark {
+    @apply bg-gray-800 border-gray-700;
+  }
+
+  /* Progress Bar Styles */
+  .progress-container {
+    @apply w-full bg-gray-200 rounded-full h-3 overflow-hidden;
+  }
+
+  .progress-fill {
+    @apply h-full rounded-full transition-all duration-700 ease-out;
+  }
+
+  .progress-xp {
+    @apply bg-gradient-to-r from-yellow-400 to-yellow-500;
+  }
+
+  .progress-words {
+    @apply bg-gradient-to-r from-teal-400 to-teal-500;
+  }
+
+  .progress-streak {
+    @apply bg-gradient-to-r from-orange-400 to-orange-500;
+  }
+
+  /* Modern Button Styles */
+  .btn-primary {
+    @apply bg-slate-800 hover:bg-slate-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5;
+  }
+
+  .btn-secondary {
+    @apply bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg transition-all duration-200;
+  }
+
+  .btn-outline {
+    @apply border-2 border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-medium py-2 px-4 rounded-lg transition-all duration-200;
+  }
+
+  .btn-disabled {
+    @apply bg-gray-100 text-gray-400 cursor-not-allowed opacity-60;
+  }
+
+  /* Level Card Styles */
+  .level-card {
+    @apply bg-white rounded-2xl shadow-lg border border-gray-100 p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+  }
+
+  .level-card-locked {
+    @apply bg-gray-50 border-gray-200 opacity-60;
+  }
+
+  .level-card-dark {
+    @apply bg-gray-800 border-gray-700;
+  }
+
+  .level-card-locked-dark {
+    @apply bg-gray-900 border-gray-600;
+  }
+
+  /* Flashcard Styles */
+  .flashcard-container {
+    perspective: 1000px;
+    @apply w-full max-w-md mx-auto;
+  }
+
+  .flashcard {
+    @apply relative w-full h-80 cursor-pointer;
+  }
+
+  .flashcard-front {
+    @apply absolute inset-0 flex flex-col items-center justify-center p-8 bg-white rounded-2xl shadow-xl border border-gray-100;
+  }
+
+  .flashcard-back {
+    @apply absolute inset-0 flex flex-col items-center justify-center p-8 bg-slate-800 text-white rounded-2xl shadow-xl;
+  }
+
+  /* Animation Classes */
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.5s ease-out;
+  }
+
+  .animate-bounce-in {
+    animation: bounceIn 0.6s ease-out;
+  }
+}
+
+@layer utilities {
+  .backface-hidden {
+    backface-visibility: hidden;
+  }
+
+  .text-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .bg-gradient-modern {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f0f9ff 100%);
+  }
+
+  .bg-gradient-modern-dark {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+  }
+}
+
+/* Keyframe Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Focus Styles */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .modern-card {
+    @apply p-4;
+  }
+
+  .level-card {
+    @apply p-4;
+  }
+}
