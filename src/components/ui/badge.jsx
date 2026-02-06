@@ -1,28 +1,41 @@
-import React from "react";
-import { cn } from "../../utils/cn";
+// src/components/ui/badge.jsx
+import React from 'react';
 
-const badgeVariants = (variant, className) => {
-  const baseClasses = "inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2";
-  
-  const variants = {
-    default: "border-transparent bg-primary text-primary-foreground shadow hover:bg-primary/80",
-    secondary: "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
-    destructive: "border-transparent bg-destructive text-destructive-foreground shadow hover:bg-destructive/80",
-    outline: "text-foreground",
+const Badge = ({ text, variant = 'default', ...props }) => {
+  const variantStyles = {
+    default: {
+      backgroundColor: '#e5e7eb',
+      color: '#374151'
+    },
+    success: {
+      backgroundColor: '#d1fae5',
+      color: '#065f46'
+    },
+    warning: {
+      backgroundColor: '#fef3c7',
+      color: '#92400e'
+    },
+    danger: {
+      backgroundColor: '#fee2e2',
+      color: '#991b1b'
+    }
   };
-  
-  return cn(baseClasses, variants[variant] || variants.default, className);
+
+  const style = {
+    display: 'inline-flex',
+    alignItems: 'center',
+    padding: '0.25rem 0.75rem',
+    fontSize: '0.75rem',
+    fontWeight: '500',
+    borderRadius: '9999px',
+    ...variantStyles[variant]
+  };
+
+  return (
+    <span style={style} {...props}>
+      {text}
+    </span>
+  );
 };
 
-function Badge({ className, variant = "default", ...props }) {
-  return (
-    <div
-      data-slot="badge"
-      className={badgeVariants(variant, className)}
-      {...props}
-    />
-  );
-}
-
-export { Badge, badgeVariants };
-
+export default Badge;
