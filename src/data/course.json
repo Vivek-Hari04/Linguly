@@ -1,0 +1,148 @@
+{
+  "courseId": "language-learner-core",
+  "structureVersion": 1,
+
+  "languages": {
+    "es": { "name": "Spanish", "difficulty": "Easy" },
+    "fr": { "name": "French", "difficulty": "Medium" },
+    "de": { "name": "German", "difficulty": "Medium" },
+    "it": { "name": "Italian", "difficulty": "Easy" },
+    "jp": { "name": "Japanese", "difficulty": "Hard" },
+    "cn": { "name": "Chinese", "difficulty": "Hard" }
+  },
+
+  "roadmap": {
+    "levels": [
+      {
+        "levelId": "level-1",
+        "title": "Foundations",
+        "goal": "Understand and form very basic sentences confidently",
+        "unlockRule": { "type": "default" },
+        "passingScore": 80,
+
+        "sublevels": [
+          {
+            "sublevelId": "l1-vocab",
+            "title": "Core Vocabulary",
+            "skills": ["vocabulary"],
+            "categories": [
+              "people_roles",
+              "places",
+              "objects",
+              "food_drinks",
+              "core_verbs",
+              "adjectives",
+              "numbers_1_20"
+            ],
+            "trainingTypes": ["mcq", "audio-word", "image-word", "recall"]
+          },
+          {
+            "sublevelId": "l1-sentences",
+            "title": "Sentence Completion",
+            "skills": ["sentence"]
+          },
+          {
+            "sublevelId": "l1-articles",
+            "title": "Articles & Gender",
+            "skills": ["grammar"]
+          },
+          {
+            "sublevelId": "l1-micro-grammar",
+            "title": "Micro Grammar",
+            "skills": ["grammar"]
+          },
+          {
+            "sublevelId": "l1-pronunciation",
+            "title": "Pronunciation Basics",
+            "skills": ["pronunciation", "listening"]
+          },
+          {
+            "sublevelId": "l1-checkpoint",
+            "title": "Level 1 Checkpoint",
+            "type": "assessment",
+            "skills": ["vocabulary", "grammar", "listening", "sentence"]
+          }
+        ]
+      },
+
+      {
+        "levelId": "level-2",
+        "title": "Sentence Builder",
+        "goal": "Build correct complete sentences reliably",
+        "unlockRule": {
+          "type": "previousLevel",
+          "levelId": "level-1",
+          "minScore": 80
+        },
+        "sublevels": [
+          { "sublevelId": "l2-vocab", "title": "Vocabulary Expansion", "skills": ["vocabulary"] },
+          { "sublevelId": "l2-construction", "title": "Sentence Construction", "skills": ["syntax"] },
+          { "sublevelId": "l2-verbs", "title": "Present Tense (Regular)", "skills": ["grammar"] },
+          { "sublevelId": "l2-questions", "title": "Questions & Negation", "skills": ["grammar"] },
+          { "sublevelId": "l2-listening", "title": "Listening Basics", "skills": ["listening"] },
+          { "sublevelId": "l2-checkpoint", "title": "Level 2 Checkpoint", "type": "assessment" }
+        ]
+      },
+
+      {
+        "levelId": "level-3",
+        "title": "Grammar Core",
+        "goal": "Control the language, not guess it",
+        "unlockRule": {
+          "type": "skillMastery",
+          "skill": "grammar",
+          "minAccuracy": 80
+        },
+        "sublevels": [
+          { "sublevelId": "l3-tenses", "title": "Verb Tenses", "skills": ["grammar"] },
+          { "sublevelId": "l3-ser-estar", "title": "Ser vs Estar", "skills": ["grammar"] },
+          { "sublevelId": "l3-prepositions", "title": "Prepositions", "skills": ["grammar"] },
+          { "sublevelId": "l3-irregulars", "title": "Irregular Verbs", "skills": ["grammar"] },
+          { "sublevelId": "l3-diagnostics", "title": "Grammar Diagnostics", "skills": ["grammar"] },
+          { "sublevelId": "l3-checkpoint", "title": "Grammar Mastery Test", "type": "assessment" }
+        ]
+      },
+
+      {
+        "levelId": "level-4",
+        "title": "Conversation & Usage",
+        "goal": "Function naturally in real situations",
+        "unlockRule": {
+          "type": "previousLevel",
+          "levelId": "level-3"
+        },
+        "sublevels": [
+          { "sublevelId": "l4-situations", "title": "Situational Language", "skills": ["conversation"] },
+          { "sublevelId": "l4-dialogs", "title": "Dialog Training", "skills": ["conversation"] },
+          { "sublevelId": "l4-formality", "title": "Formal vs Informal", "skills": ["pragmatics"] },
+          { "sublevelId": "l4-listening", "title": "Conversation Listening", "skills": ["listening"] },
+          { "sublevelId": "l4-culture", "title": "Cultural Usage", "skills": ["pragmatics"] },
+          { "sublevelId": "l4-checkpoint", "title": "Conversation Assessment", "type": "assessment" }
+        ]
+      },
+
+      {
+        "levelId": "level-5",
+        "title": "Advanced & Real-World",
+        "goal": "Think and respond naturally",
+        "unlockRule": {
+          "type": "conversationMastery",
+          "minAccuracy": 85
+        },
+        "sublevels": [
+          { "sublevelId": "l5-complex", "title": "Complex Sentences", "skills": ["grammar"] },
+          { "sublevelId": "l5-expressions", "title": "Natural Expressions", "skills": ["vocabulary"] },
+          { "sublevelId": "l5-error-sensitivity", "title": "Error Sensitivity", "skills": ["grammar"] },
+          { "sublevelId": "l5-paraphrasing", "title": "Paraphrasing", "skills": ["expression"] },
+          {
+            "sublevelId": "l5-ai-conversation",
+            "title": "AI Conversation Practice",
+            "skills": ["speaking", "grammar"],
+            "aiEnabled": true
+          },
+          { "sublevelId": "l5-final", "title": "Final Mastery Test", "type": "assessment" }
+        ]
+      }
+    ]
+  }
+}
