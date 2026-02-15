@@ -1,9 +1,16 @@
 // src/services/gemini.js
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
+function getApiKey() {
+  return (
+    localStorage.getItem("gemini_key") ||
+    import.meta.env.VITE_GEMINI_API_KEY
+  );
+}
+
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
 
 export const generateConversationResponse = async (userMessage, languageCode, languageName, conversationHistory = []) => {
-  if (!GEMINI_API_KEY) {
+  const apiKey = getApiKey();
+  if (!apiKey) {
     console.warn('Gemini API key not configured');
     return getFallbackResponse(languageCode);
   }
@@ -33,7 +40,7 @@ User: ${userMessage}
 
 Respond naturally in ${languageName}:`;
 
-    const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+    const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -71,7 +78,8 @@ Respond naturally in ${languageName}:`;
 };
 
 export const analyzeUserMessage = async (userMessage, languageCode, conversationHistory = []) => {
-  if (!GEMINI_API_KEY) {
+  const apiKey = getApiKey();
+  if (!apiKey) {
     return { feedback: null };
   }
 
@@ -101,7 +109,7 @@ Provide feedback in JSON format with:
 
 Keep feedback concise and constructive. Only include significant issues. If the message is good, say so.`;
 
-    const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+    const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -158,10 +166,12 @@ const getFallbackResponse = (languageCode) => {
 };
 
 export const checkGeminiAvailability = () => {
-  return !!GEMINI_API_KEY;
+  return !!getApiKey();
 };
+
 export const generateHint = async (word, languageCode) => {
-  if (!GEMINI_API_KEY) {
+  const apiKey = getApiKey();
+  if (!apiKey) {
     return `Think about how "${word}" is commonly used.`;
   }
 
@@ -184,7 +194,7 @@ Give a short, helpful hint (1 sentence max) for understanding or remembering thi
 
 Do NOT give the translation directly.`;
 
-    const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+    const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
