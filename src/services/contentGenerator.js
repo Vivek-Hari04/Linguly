@@ -1,8 +1,15 @@
+function getApiKey() {
+  return (
+    localStorage.getItem("gemini_key") ||
+    import.meta.env.VITE_GEMINI_API_KEY
+  );
+}
+
 import * as translationCache from './translationCache';
 
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
 const GEMINI_MODEL = "models/gemini-2.5-flash";
 const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/${GEMINI_MODEL}:generateContent`;
+
 const languageMap = {
   es: 'Spanish',
   fr: 'French',
@@ -16,7 +23,7 @@ const languageMap = {
 const inFlight = new Map();
 
 function inferCEFRLevel(levelTitle) {
-  const title = levelTitle.toLowerCase();
+  const title = (levelTitle || "").toLowerCase();
   if (title.includes('foundation') || title.includes('basic')) return 'A1-A2';
   if (title.includes('builder') || title.includes('core')) return 'B1';
   if (title.includes('conversation') || title.includes('usage')) return 'B2';
@@ -24,10 +31,20 @@ function inferCEFRLevel(levelTitle) {
   return 'A1-B2';
 }
 
-export async function generateContent(language, levelMetadata, sublevelMetadata) {
-  if (!GEMINI_API_KEY) return [];
+export async function generateContent(language, levelMetadata, sublevelMetadata, hasRetried = false) {
+  const apiKey = getApiKey();
 
-  const key = `${language}:${sublevelMetadata?.id || sublevelMetadata?.title}`;
+  // 🔴 Guard against first-render race conditions
+  if (!apiKey || !language || !levelMetadata || !sublevelMetadata) {
+    return [];
+  }
+
+  if (!sublevelMetadata.id && !sublevelMetadata.title) {
+    return [];
+  }
+
+  const key = `${language}:${sublevelMetadata.id || sublevelMetadata.title}`;
+
   if (inFlight.has(key)) {
     return inFlight.get(key);
   }
@@ -75,11 +92,14 @@ Level: ${levelMetadata?.title}
 CEFR: ${cefrLevel}
 Sublevel: ${sublevelMetadata?.title}
 
-Return ONLY a JSON array.
+Return ONLY a valid JSON array.
+Do NOT truncate.
+Ensure the JSON is complete and properly closed.
+
 `;
 
     try {
-      const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+      const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -93,12 +113,25 @@ Return ONLY a JSON array.
       const data = await response.json();
       const raw = data.candidates?.[0]?.content?.parts?.[0]?.text;
       if (!raw) return [];
+
       const match = raw.match(/\[[\s\S]*\]/);
       if (!match) return [];
 
-      const parsed = JSON.parse(match[0]);
+     let parsed;
+      try {
+        parsed = JSON.parse(match[0]);
+      } catch {
+        if (hasRetried) {
+          console.warn("Retry failed. Giving up.");
+          return [];
+        }
 
-      // 🔄 Normalize for UI + extract translations
+        console.warn("Retrying content generation once...");
+        inFlight.delete(key);
+        return generateContent(language, levelMetadata, sublevelMetadata, true);
+      }
+
+            // 🔄 Normalize for UI + extract translations
       return parsed.map(q => {
         if (q.type === 'mcq') {
           translationCache.set(language, 'en', q.question.text, q.question.en);
@@ -139,7 +172,8 @@ Return ONLY a JSON array.
         return null;
       }).filter(Boolean);
 
-    } catch {
+    } catch (err) {
+      console.error("generateContent error:", err);
       return [];
     } finally {
       inFlight.delete(key);

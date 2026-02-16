@@ -5,6 +5,13 @@ export default function AppHeader() {
   const { getLanguageInfo, selectedLanguage } = useLanguage();
   const language = getLanguageInfo(selectedLanguage);
 
+  const hasApiKey = typeof window !== "undefined" && localStorage.getItem("gemini_key");
+
+  const handleClearKey = () => {
+    localStorage.removeItem("gemini_key");
+    window.location.reload();
+  };
+
   return (
     <header className="
       sticky top-0 z-40
@@ -27,8 +34,18 @@ export default function AppHeader() {
           )}
         </div>
 
-        {/* Right: Theme toggle */}
-        <ThemeToggle />
+        {/* Right: Clear Key + Theme toggle */}
+        <div className="flex items-center gap-3">
+          {hasApiKey && (
+            <button
+              onClick={handleClearKey}
+              className="text-xs px-3 py-1 rounded-md border text-red-600 border-red-300 hover:bg-red-50 dark:hover:bg-red-900/20"
+            >
+              Clear API Key
+            </button>
+          )}
+          <ThemeToggle />
+        </div>
       </div>
     </header>
   );
