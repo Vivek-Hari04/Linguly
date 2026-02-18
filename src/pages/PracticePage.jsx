@@ -121,12 +121,26 @@ export default function PracticePage({ level, sublevel, onExit }) {
   };
 
   // ---------- 🔄 RELOAD QUESTIONS ----------
-  const handleReloadQuestions = () => {
-    contentCache.remove(selectedLanguage, sublevel.sublevelId);
-    setCurrentQuestionIndex(0);
-    setViewedQuestions(new Set());
-    loadQuestions();
-  };
+  const handleReloadQuestions = async () => {
+        const apiKey =
+          localStorage.getItem("gemini_key") ||
+          import.meta.env.VITE_GEMINI_API_KEY;
+
+        // No key → don't delete existing content
+        if (!apiKey) {
+          window.dispatchEvent(new Event("missing-api-key"));
+          return;
+        }
+
+        //  Key exists → safe to regenerate
+        contentCache.remove(selectedLanguage, sublevel.sublevelId);
+
+        setCurrentQuestionIndex(0);
+        setViewedQuestions(new Set());
+
+        await loadQuestions();
+};
+
 
   // ---------- LOADING ----------
   if (isLoading) {
