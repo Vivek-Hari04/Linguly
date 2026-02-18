@@ -10,7 +10,10 @@ const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/
 
 export const generateConversationResponse = async (userMessage, languageCode, languageName, conversationHistory = []) => {
   const apiKey = getApiKey();
+
+  // 🔴 If user tries AI without key → ask App.jsx to show overlay
   if (!apiKey) {
+    window.dispatchEvent(new Event("missing-api-key"));
     console.warn('Gemini API key not configured');
     return getFallbackResponse(languageCode);
   }
@@ -79,7 +82,9 @@ Respond naturally in ${languageName}:`;
 
 export const analyzeUserMessage = async (userMessage, languageCode, conversationHistory = []) => {
   const apiKey = getApiKey();
+
   if (!apiKey) {
+    window.dispatchEvent(new Event("missing-api-key"));
     return { feedback: null };
   }
 
@@ -171,7 +176,9 @@ export const checkGeminiAvailability = () => {
 
 export const generateHint = async (word, languageCode) => {
   const apiKey = getApiKey();
+
   if (!apiKey) {
+    window.dispatchEvent(new Event("missing-api-key"));
     return `Think about how "${word}" is commonly used.`;
   }
 

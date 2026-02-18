@@ -1,15 +1,38 @@
 import ThemeToggle from "./ThemeToggle";
 import { useLanguage } from "../../contexts/LanguageContext";
+import { useState, useEffect } from "react";
 
 export default function AppHeader() {
   const { getLanguageInfo, selectedLanguage } = useLanguage();
   const language = getLanguageInfo(selectedLanguage);
 
-  const hasApiKey = typeof window !== "undefined" && localStorage.getItem("gemini_key");
+  const [hasApiKey, setHasApiKey] = useState(false);
+
+  const checkKey = () => {
+    setHasApiKey(!!localStorage.getItem("gemini_key"));
+  };
+
+  useEffect(() => {
+    checkKey();
+
+    // When key saved manually
+    window.addEventListener("api-key-updated", checkKey);
+
+    // When key cleared manually
+    window.addEventListener("api-key-cleared", checkKey);
+
+    return () => {
+      window.removeEventListener("api-key-updated", checkKey);
+      window.removeEventListener("api-key-cleared", checkKey);
+    };
+  }, []);
 
   const handleClearKey = () => {
     localStorage.removeItem("gemini_key");
-    window.location.reload();
+    setHasApiKey(false);
+
+    // 🔔 notify app
+    window.dispatchEvent(new Event("api-key-cleared"));
   };
 
   return (

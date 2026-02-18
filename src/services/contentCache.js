@@ -12,3 +12,7 @@ export function set(language, sublevelId, content) {
   const value = JSON.stringify(content);
   localStorage.setItem(key, value);
 }
+export function remove(language, sublevelId) {
+  const key = `content:${language}:${sublevelId}`;
+  localStorage.removeItem(key);
+}
