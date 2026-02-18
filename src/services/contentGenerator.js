@@ -34,8 +34,14 @@ function inferCEFRLevel(levelTitle) {
 export async function generateContent(language, levelMetadata, sublevelMetadata, hasRetried = false) {
   const apiKey = getApiKey();
 
+  // 🔴 If AI is requested but key is missing → ask App.jsx to show overlay
+  if (!apiKey) {
+    window.dispatchEvent(new Event("missing-api-key"));
+    return [];
+  }
+
   // 🔴 Guard against first-render race conditions
-  if (!apiKey || !language || !levelMetadata || !sublevelMetadata) {
+  if (!language || !levelMetadata || !sublevelMetadata) {
     return [];
   }
 
@@ -95,7 +101,6 @@ Sublevel: ${sublevelMetadata?.title}
 Return ONLY a valid JSON array.
 Do NOT truncate.
 Ensure the JSON is complete and properly closed.
-
 `;
 
     try {
@@ -117,7 +122,7 @@ Ensure the JSON is complete and properly closed.
       const match = raw.match(/\[[\s\S]*\]/);
       if (!match) return [];
 
-     let parsed;
+      let parsed;
       try {
         parsed = JSON.parse(match[0]);
       } catch {
@@ -131,7 +136,7 @@ Ensure the JSON is complete and properly closed.
         return generateContent(language, levelMetadata, sublevelMetadata, true);
       }
 
-            // 🔄 Normalize for UI + extract translations
+      // 🔄 Normalize for UI + extract translations
       return parsed.map(q => {
         if (q.type === 'mcq') {
           translationCache.set(language, 'en', q.question.text, q.question.en);

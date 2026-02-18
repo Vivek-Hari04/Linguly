@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useProgress } from "../contexts/ProgressContext";
 import { useLanguage } from "../contexts/LanguageContext";
 import QuestionRenderer from "../components/shared/QuestionRenderer";
@@ -32,46 +32,57 @@ export default function PracticePage({ level, sublevel, onExit }) {
   const [isLoading, setIsLoading] = useState(true);
   const [contentUnavailable, setContentUnavailable] = useState(false);
 
-  // ---------- LOAD QUESTIONS ----------
-  useEffect(() => {
-    const loadQuestions = async () => {
-      setIsLoading(true);
-      setContentUnavailable(false);
+  // ---------- STABLE LOAD FUNCTION ----------
+  const loadQuestions = useCallback(async () => {
+    setIsLoading(true);
+    setContentUnavailable(false);
 
-      if (!selectedLanguage || !sublevel?.sublevelId) {
-        setQuestions([]);
-        setIsLoading(false);
-        return;
-      }
-
-      const cached = contentCache.get(selectedLanguage, sublevel.sublevelId);
-
-      if (Array.isArray(cached) && cached.length > 0) {
-        setQuestions(cached);
-        setIsLoading(false);
-        return;
-      }
-
-      const generated = await generateContent(
-        selectedLanguage,
-        level,
-        sublevel
-      );
-
-      if (Array.isArray(generated) && generated.length > 0) {
-        contentCache.set(selectedLanguage, sublevel.sublevelId, generated);
-        setQuestions(generated);
-        setContentUnavailable(false);
-      } else {
-        setQuestions([]);
-        setContentUnavailable(true);
-      }
-
+    if (!selectedLanguage || !sublevel?.sublevelId) {
+      setQuestions([]);
       setIsLoading(false);
+      return;
+    }
+
+    const cached = contentCache.get(selectedLanguage, sublevel.sublevelId);
+
+    if (Array.isArray(cached) && cached.length > 0) {
+      setQuestions(cached);
+      setIsLoading(false);
+      return;
+    }
+
+    const generated = await generateContent(
+      selectedLanguage,
+      level,
+      sublevel
+    );
+
+    if (Array.isArray(generated) && generated.length > 0) {
+      contentCache.set(selectedLanguage, sublevel.sublevelId, generated);
+      setQuestions(generated);
+      setContentUnavailable(false);
+    } else {
+      setQuestions([]);
+      setContentUnavailable(true);
+    }
+
+    setIsLoading(false);
+  }, [selectedLanguage, sublevel?.sublevelId, level]);
+
+  // ---------- INITIAL LOAD ----------
+  useEffect(() => {
+    loadQuestions();
+  }, [loadQuestions]);
+
+  // ---------- RETRY AFTER KEY IS ADDED ----------
+  useEffect(() => {
+    const handler = () => {
+      loadQuestions();
     };
 
-    loadQuestions();
-  }, [selectedLanguage, sublevel?.sublevelId, level?.levelId]);
+    window.addEventListener("api-key-added", handler);
+    return () => window.removeEventListener("api-key-added", handler);
+  }, [loadQuestions]);
 
   const totalQuestions = questions.length;
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -108,6 +119,28 @@ export default function PracticePage({ level, sublevel, onExit }) {
       setCurrentQuestionIndex(i => i + 1);
     }
   };
+
+  // ---------- 🔄 RELOAD QUESTIONS ----------
+  const handleReloadQuestions = async () => {
+        const apiKey =
+          localStorage.getItem("gemini_key") ||
+          import.meta.env.VITE_GEMINI_API_KEY;
+
+        // No key → don't delete existing content
+        if (!apiKey) {
+          window.dispatchEvent(new Event("missing-api-key"));
+          return;
+        }
+
+        //  Key exists → safe to regenerate
+        contentCache.remove(selectedLanguage, sublevel.sublevelId);
+
+        setCurrentQuestionIndex(0);
+        setViewedQuestions(new Set());
+
+        await loadQuestions();
+};
+
 
   // ---------- LOADING ----------
   if (isLoading) {
@@ -222,6 +255,16 @@ export default function PracticePage({ level, sublevel, onExit }) {
               {isLastQuestion ? "Finish" : "Next →"}
             </button>
           </div>
+
+          {/* 🔄 Show only after completing last question */}
+          {isLastQuestion && isCurrentViewed && (
+            <button
+              onClick={handleReloadQuestions}
+              className="mt-4 w-full px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+            >
+              🔄 Generate New Questions
+            </button>
+          )}
         </div>
       </div>
     </div>
